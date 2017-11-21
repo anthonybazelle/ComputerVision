@@ -16,6 +16,7 @@ class OCR
 {
 private:
 	cv::Mat matReshape;
+	cv::Mat labels;
 
 public:
 	OCR();

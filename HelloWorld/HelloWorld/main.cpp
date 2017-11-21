@@ -29,7 +29,7 @@ int main(int, char**)
 	OCR* pOCR = new OCR();
 
 	std::vector<std::string> out;
-	pOCR->GetFilesInDirectory(out, "C:/Users/Anthony/Documents/ESGI/5A DJV/Vision par ordinateur/ressources/Training");
+	pOCR->GetFilesInDirectory(out, "../../data TP OCR");
 	pOCR->launchDetecting(out);
 	
 

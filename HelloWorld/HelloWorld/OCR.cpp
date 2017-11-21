@@ -73,7 +73,7 @@ std::vector<cv::Rect> OCR::detectLetters(cv::Mat img)
 			if (appRect.width>appRect.height)
 				boundRect.push_back(appRect);
 		}
-	return boundRect;
+		return boundRect;
 }
 
 void OCR::launchDetecting(std::vector<std::string> filesName)
@@ -83,27 +83,39 @@ void OCR::launchDetecting(std::vector<std::string> filesName)
 	cv::Mat src = cv::imread(filesName.at(1), cv::WINDOW_NORMAL);
 	cv::imshow("Image 1 : ", src);*/
 
-	
-	for (std::vector<std::string>::iterator it = filesName.begin(); it != filesName.end() - 1; ++it) // J'ai mis -1 car un fichier Thumbs.db se cache ...
+	int u = 0;
+	matReshape.create(filesName.size(), 8 * 8, CV_32FC1);
+	for (std::vector<std::string>::iterator it = filesName.begin(); it != filesName.end(); ++it) // J'ai mis -1 car un fichier Thumbs.db se cache ...
 	{
-		// Seuillage
 		cv::Mat dst;
 		cv::Mat resized;
+		resized.create(8, 8, CV_32FC1);
 		cv::Mat src = cv::imread(*it, 0);
 		cv::threshold(src, dst, 130, 255, cv::THRESH_BINARY);
 		cv::resize(dst, resized, cv::Size(8, 8));
-		matReshape.push_back(resized.reshape(1, 1));
+		matReshape.push_back<float>(resized.reshape(1, 1));
 		cv::imshow("Resized", matReshape);
-		//cv::waitKey(0);
+		
+		++u;
 
 		resized.release();
 		dst.release();
 		src.release();
 	}
-	
-	cv::Mat matReshapeResult;
+
+	// A remplir !!!!!!!
+	labels(&cv::Range(0, u));
+
+
+	CvSVMParams params;
+	params.svm_type = CvSVM::C_SVC;
+	params.kernel_type = CvSVM::SIGMOID;
+	params.gamma = 3;
+
 	CvSVM svm;
-	svm.train_auto(matReshape, matReshapeResult, cv::Mat(), cv::Mat(), );
+	svm.train_auto(matReshape, labels, cv::Mat(), cv::Mat(), params);
+	svm.save("trainingOCR.txt");
+	std::cout << "Training finish and saved" << std::endl;
 	cv::imshow("Resized", matReshape);
 	cv::waitKey(0);
 }
